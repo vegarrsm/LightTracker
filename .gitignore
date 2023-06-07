@@ -64,3 +64,9 @@ buck-out/
 /vendor/bundle/
 
 .env
+run.bat
+output.log
+.VSCodeCounter
+android/app/src/debug/java/
+android/app/src/main/java/
+android/app/src/release/
