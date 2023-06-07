@@ -1,2 +1,2 @@
-export * from './connectScreen';
+export * from './loginScreen';
 export * from './homeScreen';
