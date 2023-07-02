@@ -35,10 +35,10 @@ export const useLux = () => {
 export const LuxProvider: React.FC<ProviderProps> = ({children}) => {
   const [lux, setLux] = useState<number>(0);
   const [schedule, setSchedule] = useState<Schedule>({
-    0: {lux: 0, time: 0},
-    1: {lux: 0, time: 0},
-    2: {lux: 0, time: 0},
-    3: {lux: 0, time: 0},
+    0: {lux: 0, time: 0}, // Morning
+    1: {lux: 0, time: 0}, // Day
+    2: {lux: 0, time: 0}, // Evening
+    3: {lux: 0, time: 0}, // Night
   });
 
   const getSchedule = async () => {

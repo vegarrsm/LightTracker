@@ -21,7 +21,6 @@ import TextButton from '../../components/buttons/TextButton';
 import TimePicker from '../../components/pickers/TimePicker';
 import {useScheduleStorage} from '../../util/storage';
 import {useLux} from '../../contexts/LuxContext';
-import {getFormattedSchedule} from '../../util/formatting';
 
 type SetGoalRouteParamList = {
   SetGoal: {timeOfDay: TimeOfDay[]};
@@ -40,12 +39,14 @@ const maxValue = 4096;
 
 export const SetGoal = ({route, navigation}: Props) => {
   const timeOfDay = route.params.timeOfDay[0];
-  const {storeReviewTime, firstOpen} = useScheduleStorage();
+  const {storeFirstOpen} = useScheduleStorage();
 
   const [lux, setLux] = useState(0);
   const {currentTheme} = useTheme();
   const [feedback, setFeedback] = useState('');
-  const [time, setTime] = useState(8);
+  const [time, setTime] = useState(
+    timeOfDay === TimeOfDay.Evening ? 23 * 60 : 7 * 60,
+  );
   const {schedule, setSchedule} = useLux();
 
   const correctedLux = lux ** (1 / scalingPower);
@@ -55,12 +56,12 @@ export const SetGoal = ({route, navigation}: Props) => {
     setSchedule(prev => {
       let inferredChange = timeOfDay === TimeOfDay.Morning && {
         ...prev,
-        [TimeOfDay.Day]: {...prev[TimeOfDay.Day], time: time + 3},
+        [TimeOfDay.Day]: {...prev[TimeOfDay.Day], time: time + 3 * 60}, // Might have to rechange this
       };
       if (timeOfDay === TimeOfDay.Night) {
         inferredChange = {
           ...prev,
-          [TimeOfDay.Night]: {...prev[TimeOfDay.Evening], time: time - 3},
+          [TimeOfDay.Night]: {...prev[TimeOfDay.Evening], time: time - 3 * 60}, // Might have to rechange this
         };
       }
       return {
@@ -74,9 +75,20 @@ export const SetGoal = ({route, navigation}: Props) => {
   useEffect(() => {
     console.log('params: ', timeOfDay, route);
 
+    // Calculates index for melatonin and alertness (which is roughly between 0-1)
     const calculateIndex = (calculationFunction: Function): number => {
       const result = calculationFunction(correctedLux);
-      return result > 1 ? Math.floor(result * 4) : 3;
+      console.log(
+        'RESULT',
+        result,
+        correctedLux,
+        result < 1 ? Math.floor(result * 4) : 0,
+      );
+      return correctedLux === maxValue
+        ? 5
+        : result < 1
+        ? Math.floor(result * 4)
+        : 3;
     };
 
     const selectFeedback = (
@@ -204,12 +216,12 @@ export const SetGoal = ({route, navigation}: Props) => {
       </Text>
       <TextButton
         onPress={() => {
-          storeReviewTime();
           if (route.params.timeOfDay.length > 1) {
             navigation.push('SetGoals', {
               timeOfDay: route.params.timeOfDay.slice(1),
             });
           } else {
+            storeFirstOpen(false);
             navigation.reset({index: 0, routes: [{name: 'Home'}]});
           }
           /* Do some navigation */

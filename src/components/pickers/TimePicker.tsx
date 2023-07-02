@@ -12,8 +12,8 @@ type TimeProps = {
 
 const TimePicker: React.FC<TimeProps> = ({setTime, time}) => {
   const {currentTheme} = useTheme();
-
-  const [tempTime, setTempTime] = useState(new Date(360000 * (23 + time)));
+  console.log('TIMEEEEEE', time);
+  const [tempTime, setTempTime] = useState(new Date(60000 * (time - 1 * 60)));
   const [datePickerOpen, setDatePickerOpen] = useState(false);
 
   // Make a useEffect(() => {}, [datePickerOpen]); to reset tempTime if cancelled by clicking outside of the timepicker
@@ -27,9 +27,7 @@ const TimePicker: React.FC<TimeProps> = ({setTime, time}) => {
         marginTop: 25,
       }}>
       <TextButton
-        title={new Date(new Date(3600000 * (23 + time)))
-          .toTimeString()
-          .slice(0, 5)}
+        title={new Date(60000 * (23 * 60 + time)).toTimeString().slice(0, 5)}
         onPress={() => setDatePickerOpen(true)}
         style={{
           paddingHorizontal: 50,
@@ -79,7 +77,7 @@ const TimePicker: React.FC<TimeProps> = ({setTime, time}) => {
             title="Confirm"
             onPress={() => {
               console.log(tempTime);
-              setTime(tempTime.getHours() + tempTime.getMinutes() / 60);
+              setTime(tempTime.getHours() * 60 + tempTime.getMinutes()); // Make sure it does not ruin to change from this setTime(tempTime.getHours() + tempTime.getMinutes() / 60);
               setDatePickerOpen(false);
             }}
           />

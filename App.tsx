@@ -26,7 +26,7 @@ const defaultOptions = {headerShown: false};
 const RenderApp = () => {
   const {accessToken} = useFirebase();
   const {device, monitor, setDevice, setMonitor, manager} = useDevice();
-  const {setLux} = useLux(); //Consider if this is bad for performance
+  const {setLux, schedule} = useLux(); //Consider if this is bad for performance
   const {storeData} = useRecordStorage();
   const {reviewTime, firstOpen, storeReviewTime} = useScheduleStorage();
   const {startScan, stopScan, deviceList, isScanning} = useDeviceScan({
@@ -38,13 +38,6 @@ const RenderApp = () => {
 
   useEffect(() => {
     const deviceId = getDeviceIdFromRealm();
-    console.log(
-      '\nAPP EFFECT: ',
-      deviceId,
-      monitor === null,
-      deviceId && !monitor,
-      isScanning,
-    );
     if (deviceId && !monitor && !isScanning) {
       // Add condition here
       startScan(
@@ -80,6 +73,7 @@ const RenderApp = () => {
     stopScan,
     storeData,
   ]);
+  console.log(schedule);
 
   useEffect(() => {
     const dev = deviceList.find(d => d.id === getDeviceIdFromRealm());

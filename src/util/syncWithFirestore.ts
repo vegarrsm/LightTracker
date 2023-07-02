@@ -18,8 +18,10 @@ export const syncWithFirestore = async (
   db: FirebaseFirestoreTypes.Module,
 ) => {
   try {
-    console.log('Add doc');
-    const docRef = db?.collection('testuserid').doc('newDoc');
+    console.log('Add doc', db.app.auth().currentUser?.email);
+    const docRef = db
+      ?.collection(db.app.auth().currentUser?.email || 'noEmail')
+      .doc('newDoc');
     //const storedData = realm.objects<Record>('Record');
     const formatted = data.map(record => {
       return {

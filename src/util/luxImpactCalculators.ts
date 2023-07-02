@@ -23,6 +23,16 @@ export const calculateMelatonin = (luxValue: number): number => {
   );
 };
 
-export const calculateAlertness = (luxValue: number): number => {
-  return luxValue / 1000;
+export const calculateAlertness = (lux: number): number => {
+  const a = -24.4;
+  const b = 94.8;
+  const c = 3.7;
+  const d = -8.11;
+
+  let result = (a - d) / (1 + Math.pow(lux / b, c)) + d;
+
+  // Normalize to 0-1
+  result = (result - a) / (d - a);
+
+  return result;
 };

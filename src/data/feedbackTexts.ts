@@ -47,10 +47,12 @@ export const melatoninFeedback = (
   feedbackValue: number,
 ): string =>
   [
-    `MelFeedBack1, ${feedbackValue} and more`,
-    `MelFeedBack2, ${feedbackValue} and more`,
-    `MelFeedBack3, ${feedbackValue} and more`,
-    `MelFeedBack4, ${feedbackValue} and more`,
+    `This light level would not suppress melatonin by any meaningful amount. This would allow you to fall asleep easily and get good sleep quality. This would also mean your circadian rhythm is not shifted to a later time.`,
+    `This light level would suppress melatonin by approximately ${feedbackValue}%. This would allow you to fall asleep easily and get good sleep quality. This would also mean your circadian rhythm is not shifted to a later time.`,
+    `This light level would suppress melatonin by approximately ${feedbackValue}%. This would only slightly affect how easily you fall asleep, your sleep quality and your circadian rhythm.`,
+    `This light level would suppress melatonin by approximately ${feedbackValue}%. This would make it a bit harder to fall asleep, somewhat reduce your sleep quality and shift your circadian rhythm to a later time.`,
+    `This light level would suppress melatonin by approximately ${feedbackValue}%. This would make it harder to fall asleep, reduce your sleep quality and shift your circadian rhythm to a later time.`,
+    `This light level would suppress melatonin by approximately ${feedbackValue}%+. This would make it harder to fall asleep, reduce your sleep quality and shift your circadian rhythm to a later time.`,
   ][index];
 
 export const phaseShiftFeedback = (
@@ -65,10 +67,10 @@ export const phaseShiftFeedback = (
     )}% of the maximum phase shift possible. This means your circadian rhythm would not be affected much. In other words, it would not be actively detrimental but it would not restore it either if you had too much light at night or not enough another morning.`,
     `This light intensity would give ${(feedbackValue / -0.03).toFixed(
       0,
-    )}% of the maximum phase shift possible.`,
+    )}% of the maximum phase shift possible. This would somewhat restore your circadian rhythm if you had too much light at night or not enough another morning.`,
     `This light intensity would give ${(feedbackValue / -0.03).toFixed(
       0,
-    )}% of the maximum phase shift possible.`,
+    )}% of the maximum phase shift possible. This would have a significant positive effect on your circadian rhythm.`,
     `This light intensity would give ${(feedbackValue / -0.03).toFixed(
       0,
     )}% of the maximum phase shift possible. This means your circadian rhythm would adjust to the wake up time very quickly.`,
@@ -82,11 +84,14 @@ export const alertnessFeedback = (
   feedbackValue: number,
 ): string =>
   [
-    `AlertFeedBack1, ${feedbackValue} and more`,
-    `AlertFeedBack2, ${feedbackValue} and more`,
-    `AlertFeedBack3, ${feedbackValue} and more`,
-    `AlertFeedBack4, ${feedbackValue} and more`,
-  ][index];
+    'This light level would make you feel sleepy, and make you very sensitive to light at night (in terms of melatonin suppression).',
+    'This light level would not help your alertness.',
+    'This light level would have a somewhat positive effect on your alertness, and somewhat reduce your sensitivity to light at night (in terms of melatonin suppression).',
+    'This light level would have a significant positive effect on your alertness, and significantly reduce your sensitivity to light at night (in terms of melatonin suppression).',
+  ][index] +
+  ` It would give you approximately ${Math.round(
+    feedbackValue * 100,
+  )}% of the maximum possible effect in terms of alertness.`;
 
 const luxReference = [
   {maxLux: 1, description: 'a night sky.'},

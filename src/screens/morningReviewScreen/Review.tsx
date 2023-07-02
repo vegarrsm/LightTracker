@@ -7,9 +7,8 @@ import {
   TimeOfDay,
   TimeSections,
 } from '../../components/charts/util/gradientCalculator';
-import {adherenceCalculator} from '../../util/adherenceCalculator';
 import recommender, {computeHourlyAverage} from '../../util/recommender';
-import {Record} from '../../util/storage';
+import {Record, useScheduleStorage} from '../../util/storage';
 import {useFirebase} from '../../contexts/FirebaseContext';
 import {readFromFirestore} from '../../util/readFromFirestore';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
@@ -30,6 +29,7 @@ const Review: React.FC = () => {
   const {currentTheme} = useTheme();
   const {firestoreDb} = useFirebase();
   const {reset} = useNavigation<StackNavigationProp<ParamListBase>>();
+  const {storeReviewTime} = useScheduleStorage();
 
   const [realData, setRealData] = useState<Record[]>([]);
 
@@ -94,6 +94,7 @@ const Review: React.FC = () => {
           title="Next"
           onPress={() => {
             reset({index: 0, routes: [{name: 'Home'}]});
+            storeReviewTime();
           }}
         />
       </View>
