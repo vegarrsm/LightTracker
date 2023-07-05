@@ -55,7 +55,6 @@ const useDeviceScan = ({manager, scanFilter}: UseDeviceScanOptions) => {
 
   const startScan = useCallback(
     (optionalFilter?: (device: Device) => boolean) => {
-      console.log('startIIIIING', optionalFilter !== undefined);
       optionalFilter
         ? setScanState({activeScanFilter: optionalFilter, isScanning: true})
         : setScanState(prev => ({...prev, isScanning: true}));
@@ -65,7 +64,6 @@ const useDeviceScan = ({manager, scanFilter}: UseDeviceScanOptions) => {
 
   const stopScan = useCallback(
     () => {
-      console.log('EEEEENNNNDing');
       setScanState(prev => ({...prev, isScanning: false}));
     },
     [], // add dependencies if needed

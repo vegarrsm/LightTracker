@@ -13,12 +13,13 @@ import {useFirebase} from '../../contexts/FirebaseContext';
 import {readFromFirestore} from '../../util/readFromFirestore';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
+import {useLux} from '../../contexts/LuxContext';
 
 const times: TimeSections = [
-  {name: TimeOfDay.Night, startTime: 23, formatted: '23:00', goal: 1},
   {name: TimeOfDay.Morning, startTime: 7, formatted: '07:00', goal: 500},
   {name: TimeOfDay.Day, startTime: 10, formatted: '10:00', goal: 150},
   {name: TimeOfDay.Evening, startTime: 20, formatted: '20:00', goal: 10},
+  {name: TimeOfDay.Night, startTime: 23, formatted: '23:00', goal: 1},
 ];
 /* const lineData = [
   1, 10, 1, 0, 5, 1, 1, 10, 500, 400, 450, 500, 400, 250, 250, 250, 400, 250,
@@ -30,6 +31,7 @@ const Review: React.FC = () => {
   const {firestoreDb} = useFirebase();
   const {reset} = useNavigation<StackNavigationProp<ParamListBase>>();
   const {storeReviewTime} = useScheduleStorage();
+  const {schedule} = useLux();
 
   const [realData, setRealData] = useState<Record[]>([]);
 
@@ -47,7 +49,10 @@ const Review: React.FC = () => {
   useEffect(() => {
     console.log('firestoredb: ', firestoreDb?.app.name);
     firestoreDb &&
-      readFromFirestore('test', firestoreDb)
+      readFromFirestore(
+        firestoreDb.app.auth().currentUser?.email || 'test',
+        firestoreDb,
+      )
         .then((data: Record[]) => {
           setRealData(data);
         })
@@ -55,9 +60,19 @@ const Review: React.FC = () => {
           console.log(error);
         });
   }, [firestoreDb]);
+
   useEffect(() => {
-    console.log('FETCH WORKED!!!', realData[100]);
-  }, [realData]);
+    console.log('schedule: ', schedule);
+    times.forEach(time => {
+      console.log('time', time);
+      if (schedule[time.name] !== undefined) {
+        time.goal = schedule[time.name].lux;
+        time.startTime = schedule[time.name].time / 60;
+      }
+    });
+    console.log('timesss', times);
+  }, [schedule]);
+
   const lineData = computeHourlyAverage(realData);
   const feedback = recommender(realData, times);
 

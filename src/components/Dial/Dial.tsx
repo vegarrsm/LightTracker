@@ -21,7 +21,8 @@ const ExponentialGauge: React.FC<ExponentialGaugeProps> = ({
   const size = width * 0.8;
   const gaugeRadius = size / 2;
   const minValue = 0;
-  const maxValue = 100000;
+  const maxValue = 4096;
+  const scalingPower = 2.8;
 
   const angleStep = 315 / 10;
   const markerLines = [];
@@ -45,7 +46,7 @@ const ExponentialGauge: React.FC<ExponentialGaugeProps> = ({
     );
 
     const labelText = formatLabelText(
-      minValue + (maxValue - minValue) * (i / 10) ** 4,
+      minValue + (maxValue - minValue) * (i / 10) ** scalingPower,
     );
 
     const labelPosition = calculateMarkerPosition(angle, 0.95, gaugeRadius);
@@ -68,6 +69,7 @@ const ExponentialGauge: React.FC<ExponentialGaugeProps> = ({
     minValue,
     maxValue,
     gaugeRadius,
+    scalingPower,
   );
 
   return (

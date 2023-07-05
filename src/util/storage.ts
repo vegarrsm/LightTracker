@@ -1,5 +1,7 @@
 import {useState, useEffect} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useFirebase} from '../contexts/FirebaseContext';
+import {syncWithFirestore} from './syncWithFirestore';
 
 export type Record = {
   time: number;
@@ -10,6 +12,7 @@ export type Record = {
 
 const useRecordStorage = () => {
   const [data, setData] = useState<Record[]>([]);
+  const {firestoreDb} = useFirebase();
 
   const loadData = async () => {
     try {
@@ -29,7 +32,7 @@ const useRecordStorage = () => {
   }, []);
 
   useEffect(() => {
-    const storeData = async () => {
+    const asyncStoreData = async () => {
       try {
         await AsyncStorage.setItem('records', JSON.stringify(data));
       } catch (error) {
@@ -38,14 +41,30 @@ const useRecordStorage = () => {
       }
     };
 
-    storeData();
+    asyncStoreData();
   }, [data]);
 
   const storeData = async (record: Record) => {
-    setData(prevData => [...prevData, record]);
+    setData(prevData => {
+      // Add new record to existing data
+      const updatedData = [...prevData, record];
+      console.log('DATA LENGTH STORING DATA', updatedData.length, updatedData);
+
+      if (updatedData.length >= 60 && firestoreDb) {
+        // Send data to Firestore and clear AsyncStorage
+        console.log('SYNCING...');
+        syncWithFirestore(updatedData, clearData, firestoreDb);
+        // Clear local data
+        return [];
+      } else {
+        // Update AsyncStorage
+        return updatedData;
+      }
+    });
   };
 
   const clearData = async () => {
+    console.log('clearing data');
     try {
       await AsyncStorage.removeItem('records');
       setData([]);
@@ -149,16 +168,18 @@ export const useScheduleStorage = () => {
       value ? setFirstOpen(false) : setFirstOpen(true);
     });
   };
-  const storeFirstOpen = async (clear?: boolean) => {
+  const storeFirstOpen = (clear?: boolean) => {
+    console.log('\n\n\nNO LONGER FIRST OPEN!!!!!!!\n\n\n\n\n', clear);
     try {
       clear
-        ? await AsyncStorage.setItem('firstOpen', JSON.stringify(true))
-        : AsyncStorage.removeItem('firstOpen');
+        ? AsyncStorage.removeItem('firstOpen')
+        : AsyncStorage.setItem('firstOpen', JSON.stringify(false));
     } catch (error) {
       // Error saving data
       console.log(error);
     }
   };
+
   const storeReviewTime = async () => {
     try {
       await AsyncStorage.setItem('lastReview', JSON.stringify(new Date()));

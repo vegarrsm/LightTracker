@@ -50,40 +50,39 @@ export const SetGoal = ({route, navigation}: Props) => {
   const {schedule, setSchedule} = useLux();
 
   const correctedLux = lux ** (1 / scalingPower);
-  console.log(schedule);
+  console.log('SETGOAAAAAAAAAAAAAALS OPENED \n\n\n\n\n\n');
 
   useEffect(() => {
+    console.log(
+      '\nTIME: ',
+      time,
+      timeOfDay,
+      timeOfDay === TimeOfDay.Morning,
+      timeOfDay === TimeOfDay.Evening,
+      'wat?',
+    );
     setSchedule(prev => {
-      let inferredChange = timeOfDay === TimeOfDay.Morning && {
-        ...prev,
-        [TimeOfDay.Day]: {...prev[TimeOfDay.Day], time: time + 3 * 60}, // Might have to rechange this
-      };
+      let inferredTime = time;
+      if (timeOfDay === TimeOfDay.Day) {
+        inferredTime = prev[0].time + 3 * 60;
+      }
+      if (timeOfDay === TimeOfDay.Evening) {
+        inferredTime = time - 3 * 60;
+      }
       if (timeOfDay === TimeOfDay.Night) {
-        inferredChange = {
-          ...prev,
-          [TimeOfDay.Night]: {...prev[TimeOfDay.Evening], time: time - 3 * 60}, // Might have to rechange this
-        };
+        inferredTime = prev[2].time + 3 * 60;
       }
       return {
         ...prev,
-        ...inferredChange,
-        [timeOfDay]: {time: time, lux: correctedLux},
+        [timeOfDay]: {time: inferredTime, lux: correctedLux},
       };
     });
   }, [setSchedule, time, timeOfDay, correctedLux]);
 
   useEffect(() => {
-    console.log('params: ', timeOfDay, route);
-
     // Calculates index for melatonin and alertness (which is roughly between 0-1)
     const calculateIndex = (calculationFunction: Function): number => {
       const result = calculationFunction(correctedLux);
-      console.log(
-        'RESULT',
-        result,
-        correctedLux,
-        result < 1 ? Math.floor(result * 4) : 0,
-      );
       return correctedLux === maxValue
         ? 5
         : result < 1
@@ -104,19 +103,12 @@ export const SetGoal = ({route, navigation}: Props) => {
     switch (timeOfDay) {
       case TimeOfDay.Morning:
         const shift = calculateShift(correctedLux);
-        console.log('SHIFT', shift);
         const i =
           shift > 0 // if 1
             ? 0
             : Math.round(correctedLux) !== maxValue // if 2
             ? Math.floor(Math.abs(shift / -3) * 4) + 1
             : 5;
-        console.log(
-          'CALCULATESHIFT',
-          correctedLux,
-          shift,
-          Math.floor(Math.abs(shift / -3) * 4),
-        );
         selectFeedback(
           phaseShiftFeedback,
           calculateShift,
@@ -140,13 +132,7 @@ export const SetGoal = ({route, navigation}: Props) => {
         break;
     }
   }, [correctedLux, route, timeOfDay]);
-  console.log(
-    'TIME OF DAY WRITTEN: ',
-    TimeOfDay[timeOfDay],
-    timeOfDay,
-    route.params.timeOfDay,
-  );
-  console.log(navigation.getState().index);
+
   return (
     <ScrollView
       contentContainerStyle={{

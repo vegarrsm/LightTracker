@@ -81,7 +81,13 @@ const calculateDayNight = (
   const span = Math.abs(
     endTime > startTime ? endTime - startTime : 24 - startTime + endTime,
   );
-  console.log(startTime, endTime, span, totals.average);
+  console.log(
+    'startTime, endTime, span, totals.average',
+    startTime,
+    endTime,
+    span,
+    totals.average,
+  );
   return [totals.average / span, totals.spiking / span];
 };
 
@@ -105,7 +111,11 @@ export const adherenceCalculator = (
         .reverse()
         .find(sec => hour >= sec.startTime)?.goal ||
       sections.sort((a, b) => b.startTime - a.startTime)[0].goal; // Choose latest goal if no startTime is lower than hour
-    const averageLux = total[1] / countPerHour[hour];
+    const averageLux =
+      total[1] / countPerHour[hour] !== 0 ? total[1] / countPerHour[hour] : 1;
+    if (goal === 0) {
+      goal = 1;
+    }
     const luxAdherence = isBrightHour(hour, sections)
       ? averageLux / goal
       : goal / averageLux;

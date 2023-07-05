@@ -2,6 +2,7 @@ import Location from 'react-native-get-location';
 import Realm from 'realm';
 import {Record} from './storage';
 
+// Moved away from Realm, but keeping this code for reference
 export const storeItem = (lux: number, timestamp: number) => {
   console.log('storeItem: ', lux, new Date(timestamp).toISOString());
   // Get the current location

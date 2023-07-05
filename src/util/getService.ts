@@ -8,6 +8,7 @@ import {Buffer} from 'buffer';
 //import {storeItem} from './storeItem';
 import {getDeviceIdFromRealm, storeDeviceIdInRealm} from './realmDevice';
 import {Record} from './storage';
+import Location from 'react-native-get-location';
 
 export const getService = async (
   device: Device,
@@ -23,6 +24,7 @@ export const getService = async (
     disconnectListener = device.onDisconnected(err => {
       console.log('DEVICE DISCONNECTED!!!!!!!!');
       console.log('err ', err);
+      console.log('maxTries: ', maxTries);
     });
 
     // Resource Management: Stop previous monitoring
@@ -137,17 +139,21 @@ export const getService = async (
               const lux = parseInt(luxString, 10);
               const arduinoTimestamp =
                 timebase.getTime() + parseInt(arduinoTimestampString, 10);
+              const location = await Location.getCurrentPosition({
+                enableHighAccuracy: true,
+                timeout: 8000,
+              });
               console.log('Store data', {
                 lux,
                 time: arduinoTimestamp,
-                latitude: 0,
-                longitude: 0,
+                latitude: location.latitude,
+                longitude: location.longitude,
               });
               storeData({
                 lux,
                 time: arduinoTimestamp,
-                latitude: 0,
-                longitude: 0,
+                latitude: location.latitude,
+                longitude: location.longitude,
               });
               console.log('Lux:', lux);
               console.log(

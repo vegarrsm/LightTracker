@@ -48,11 +48,21 @@ export const melatoninFeedback = (
 ): string =>
   [
     `This light level would not suppress melatonin by any meaningful amount. This would allow you to fall asleep easily and get good sleep quality. This would also mean your circadian rhythm is not shifted to a later time.`,
-    `This light level would suppress melatonin by approximately ${feedbackValue}%. This would allow you to fall asleep easily and get good sleep quality. This would also mean your circadian rhythm is not shifted to a later time.`,
-    `This light level would suppress melatonin by approximately ${feedbackValue}%. This would only slightly affect how easily you fall asleep, your sleep quality and your circadian rhythm.`,
-    `This light level would suppress melatonin by approximately ${feedbackValue}%. This would make it a bit harder to fall asleep, somewhat reduce your sleep quality and shift your circadian rhythm to a later time.`,
-    `This light level would suppress melatonin by approximately ${feedbackValue}%. This would make it harder to fall asleep, reduce your sleep quality and shift your circadian rhythm to a later time.`,
-    `This light level would suppress melatonin by approximately ${feedbackValue}%+. This would make it harder to fall asleep, reduce your sleep quality and shift your circadian rhythm to a later time.`,
+    `This light level would suppress melatonin by approximately ${Math.round(
+      feedbackValue * 100,
+    )}%. This would allow you to fall asleep easily and get good sleep quality. This would also mean your circadian rhythm is not shifted to a later time.`,
+    `This light level would suppress melatonin by approximately ${Math.round(
+      feedbackValue * 100,
+    )}%. This would only slightly affect how easily you fall asleep, your sleep quality and your circadian rhythm.`,
+    `This light level would suppress melatonin by approximately ${Math.round(
+      feedbackValue * 100,
+    )}%. This would make it a bit harder to fall asleep, somewhat reduce your sleep quality and shift your circadian rhythm to a later time.`,
+    `This light level would suppress melatonin by approximately ${Math.round(
+      feedbackValue * 100,
+    )}%. This would make it harder to fall asleep, reduce your sleep quality and shift your circadian rhythm to a later time.`,
+    `This light level would suppress melatonin by approximately ${Math.round(
+      feedbackValue * 100,
+    )}%+. This would make it harder to fall asleep, reduce your sleep quality and shift your circadian rhythm to a later time.`,
   ][index];
 
 export const phaseShiftFeedback = (

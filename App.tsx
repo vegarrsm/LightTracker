@@ -26,7 +26,7 @@ const defaultOptions = {headerShown: false};
 const RenderApp = () => {
   const {accessToken} = useFirebase();
   const {device, monitor, setDevice, setMonitor, manager} = useDevice();
-  const {setLux, schedule} = useLux(); //Consider if this is bad for performance
+  const {lux, setLux, schedule} = useLux(); //Consider if this is bad for performance
   const {storeData} = useRecordStorage();
   const {reviewTime, firstOpen, storeReviewTime} = useScheduleStorage();
   const {startScan, stopScan, deviceList, isScanning} = useDeviceScan({
@@ -35,25 +35,52 @@ const RenderApp = () => {
   });
   const {currentTheme} = useTheme();
   const [initialRoute, setInitialRoute] = React.useState('Home');
+  const [retryStall, setRetryStall] = React.useState(true);
+  const lastBatchRef = React.useRef<number>(Date.now());
 
+  // Reconnect attempt if no data is not received for 15 seconds
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const deviceId = getDeviceIdFromRealm();
+      if (lastBatchRef.current + 15000 < Date.now() && deviceId) {
+        device?.isConnected().then(isConnected => {
+          !isConnected &&
+            startScan(
+              d =>
+                d?.id?.toLowerCase().includes(deviceId.toLowerCase()) || false,
+            );
+        });
+      }
+    }, 1000);
+
+    // Clear the interval when the component unmounts
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [device, startScan]);
+
+  // Checks if new batch has been received
+  useEffect(() => {
+    lastBatchRef.current = Date.now();
+  }, [lux]);
+
+  // Connect to device when opening app
   useEffect(() => {
     const deviceId = getDeviceIdFromRealm();
-    if (deviceId && !monitor && !isScanning) {
+    if (deviceId && !monitor && !isScanning && retryStall) {
+      setRetryStall(false);
+      setTimeout(() => {
+        console.log('retrystall true');
+        setRetryStall(true);
+      }, 2000);
       // Add condition here
       startScan(
         d => d?.id?.toLowerCase().includes(deviceId.toLowerCase()) || false,
       );
       console.log('back', device?.name);
       if (device) {
-        getService(
-          device,
-          setLux,
-          monitor,
-          setMonitor,
-          setDevice,
-          storeData,
-          15,
-        )
+        console.log('calling getService');
+        getService(device, setLux, monitor, setMonitor, setDevice, storeData, 5)
           .then(() => {
             stopScan();
           })
@@ -63,6 +90,7 @@ const RenderApp = () => {
       }
     }
   }, [
+    retryStall,
     device,
     isScanning,
     monitor,
@@ -85,16 +113,25 @@ const RenderApp = () => {
   }, [deviceList, stopScan, setDevice]); // A bit spaghetti to do this, should probably find a way to do it within useDeviceScan
 
   useEffect(() => {
+    console.log(
+      'useEffect',
+      reviewTime,
+      new Date(0),
+      new Date().getDate(),
+      reviewTime.getDate() !== new Date().getDate(),
+      reviewTime !== new Date(0),
+    );
     if (firstOpen) {
       setInitialRoute('SetGoals');
       storeReviewTime();
     } else if (
-      reviewTime.toLocaleDateString() !== new Date().toLocaleDateString()
+      reviewTime.getTime() !== new Date(0).getTime() &&
+      reviewTime.getDate() !== new Date().getDate() // For longer usage this should be changed to account for if someone opens same day of another month
     ) {
       setInitialRoute('Morning');
     }
-  }, [firstOpen, initialRoute, reviewTime, storeReviewTime]);
-
+  }, [firstOpen, initialRoute, reviewTime, schedule, storeReviewTime]);
+  console.log('INITIAL ROUTE', initialRoute);
   return (
     <View
       style={{

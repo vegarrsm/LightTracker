@@ -10,7 +10,7 @@ interface LuxContextType {
   setSchedule: React.Dispatch<React.SetStateAction<Schedule>>;
 }
 
-type timeLux = {
+export type timeLux = {
   time: number;
   lux: number;
 };
@@ -20,6 +20,14 @@ export type Schedule = {
   1: timeLux;
   2: timeLux;
   3: timeLux;
+};
+
+export const checkSchedule = (schedule: Schedule): boolean => {
+  let scheduleOk = false;
+  Object.values(schedule).forEach(item => {
+    item.lux !== 0 && item.time !== 0 && (scheduleOk = true);
+  });
+  return scheduleOk;
 };
 
 const LuxContext = createContext<LuxContextType | undefined>(undefined);
@@ -44,6 +52,7 @@ export const LuxProvider: React.FC<ProviderProps> = ({children}) => {
   const getSchedule = async () => {
     try {
       const storedData = await AsyncStorage.getItem('schedule');
+      console.log('storedData', storedData, JSON.parse(storedData));
       if (storedData) {
         setSchedule(JSON.parse(storedData));
       }
@@ -56,6 +65,7 @@ export const LuxProvider: React.FC<ProviderProps> = ({children}) => {
 
   const storeSchedule = async (s: Schedule) => {
     try {
+      console.log('storing schedule: ', s);
       await AsyncStorage.setItem('schedule', JSON.stringify(s));
     } catch (error) {
       console.log(error);
@@ -63,7 +73,7 @@ export const LuxProvider: React.FC<ProviderProps> = ({children}) => {
   };
 
   useEffect(() => {
-    storeSchedule(schedule);
+    checkSchedule(schedule) && storeSchedule(schedule);
   }, [schedule]);
 
   useEffect(() => {

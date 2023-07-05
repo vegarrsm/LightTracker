@@ -12,7 +12,7 @@ export const formatLabelText = (value: number) => {
       precision === 0
         ? roundedValue.toLocaleString()
         : roundedValue.toFixed(precision);
-    return formattedValue;
+    return formattedValue.replace(/\.0+$/, '');
   }
 };
 

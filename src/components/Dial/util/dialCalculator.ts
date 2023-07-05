@@ -16,12 +16,14 @@ export function getIndicatorPositionAndAngle(
   minValue: number,
   maxValue: number,
   gaugeRadius: number,
+  power: number,
 ) {
   const startAngle = 202.5;
   const angleStep = 315 / 10;
   const valueAngle =
     startAngle +
-    ((value - minValue) / (maxValue - minValue)) ** 0.25 * (angleStep * 10);
+    ((value - minValue) / (maxValue - minValue)) ** (1 / power) *
+      (angleStep * 10);
 
   const valuePosition = calculateMarkerPosition(valueAngle, 0.65, gaugeRadius);
 
